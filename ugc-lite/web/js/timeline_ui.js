@@ -37,7 +37,7 @@ export class TimelineUI {
       el('span', { class: 'fraco rot-modo' }, 'Ao inserir/excluir:'), this.selModo,
       el('span', { class: 'sep' }),
       botao('Texto', () => ed.adicionarTexto(), { classe: 'peq', ic: 'texto', titulo: 'Adicionar texto no cursor' }),
-      this.btTrecho = botao('Excluir trecho marcado', () => ed.excluirTrecho(), { classe: 'peq perigo oculto', ic: 'tesoura' }),
+      this.btTrecho = botao('Excluir trecho marcado', () => ed.excluirTrecho(), { classe: 'peq perigo oculto', ic: 'tesoura', titulo: 'Exclui o trecho azul (X). Esc desmarca.' }),
       el('div', { class: 'cresce' }),
       el('div', { class: 'legenda-cores' },
         el('span', {}, el('i', { style: { background: 'var(--perigo)' } }), 'áudio sem vídeo'),
@@ -301,8 +301,8 @@ export class TimelineUI {
     e.preventDefault();
     const t0 = this.tDeEvento(e);
     const selecionar = e.shiftKey;
-    if (!selecionar) { ed.trecho = null; this.btTrecho.classList.add('oculto'); this.conteudo.querySelector('.selecao-trecho')?.remove(); }
     ed.irPara(t0);
+    if (selecionar) this.conteudo.querySelector('.selecao-trecho')?.remove();
     const sel = selecionar ? el('div', { class: 'selecao-trecho' }) : null;
     if (sel) this.conteudo.append(sel);
     const mover = (ev) => {

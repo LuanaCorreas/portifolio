@@ -366,9 +366,9 @@ input[type=color] { width: 38px; height: 30px; padding: 0 2px; border: 1px solid
 .opcao span { color: var(--texto-2); font-size: 12.5px; }
 
 #avisos { position: fixed; top: 16px; right: 16px; z-index: 200; display: flex; flex-direction: column; gap: 8px; max-width: 380px; }
-.aviso { background: var(--painel-2); border: 1px solid var(--borda-forte); border-left: 4px solid var(--info); border-radius: 10px; padding: 11px 14px; box-shadow: var(--sombra); font-size: 13px; animation: entra .2s ease-out; }
-.aviso.erro { border-left-color: var(--perigo); }
-.aviso.ok { border-left-color: var(--ok); }
+.toast { background: var(--painel-2); border: 1px solid var(--borda-forte); border-left: 4px solid var(--info); border-radius: 10px; padding: 11px 14px; box-shadow: var(--sombra); font-size: 13px; animation: entra .2s ease-out; }
+.toast.erro { border-left-color: var(--perigo); }
+.toast.ok { border-left-color: var(--ok); }
 @keyframes entra { from { transform: translateY(-8px); opacity: 0; } }
 
 #tarefas { position: fixed; right: 16px; bottom: 16px; z-index: 90; width: 300px; display: flex; flex-direction: column; gap: 8px; }

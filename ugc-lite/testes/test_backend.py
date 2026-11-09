@@ -150,6 +150,25 @@ class TestMontagemELegendas(unittest.TestCase):
                 "corre e garante o seu no link na bio"]))
         self.assertTrue(all(i["status"] == "pendente" for e in r["etapas"] for i in e["itens"]))
 
+    def test_take_unico_longo_dividido_por_assunto(self):
+        p = projetos.criar("Take único", {"produto": "Sérum Glow", "cta": "link na bio"})
+        pid = p["id"]
+        segs, t = [], 0.3
+        for frase in ["você sabia que existe um segredo", "esse é o sérum glow que eu recebi",
+                      "eu aplico duas gotas e espalho", "a pele fica macia eu amei",
+                      "corre e garante no link na bio"]:
+            segs.append(segmento(frase, t))
+            t = segs[-1]["fim"] + 0.5  # pausas curtas: nada de "pausa longa"
+        _criar_midia(pid, "mU", "unico.mp4", t + 1)
+        config.gravar_json(projetos.pasta(pid) / "analise" / "mU.json",
+                           {"frases": analise.montar_frases(segs), "movimento": []})
+        projetos.alterar(pid, lambda pr: projetos.midia(pr, "mU").__setitem__("analise", {"nota": 80, "melhor": True}))
+        r = montagem.montar(pid)
+        preenchidas = [e["chave"] for e in r["etapas"] if e["itens"]]
+        self.assertEqual(preenchidas, ["gancho", "apresentacao", "aplicacao", "beneficios", "cta"])
+        cta = next(e for e in r["etapas"] if e["chave"] == "cta")["itens"][0]
+        self.assertIn("link na bio", cta["texto"])
+
     def test_legendas_ancoradas(self):
         pid = self.p["id"]
         projetos.salvar_edicao(pid, {"timeline": {"clipes": [

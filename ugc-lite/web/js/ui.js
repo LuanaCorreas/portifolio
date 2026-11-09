@@ -73,7 +73,7 @@ export function escapar(t) {
 // ------------------------------------------------ avisos
 export function aviso(texto, tipo = 'info', ms = 4500) {
   const caixa = document.getElementById('avisos');
-  const a = el('div', { class: 'aviso ' + tipo, role: tipo === 'erro' ? 'alert' : 'status' }, texto);
+  const a = el('div', { class: 'toast ' + tipo, role: tipo === 'erro' ? 'alert' : 'status' }, texto);
   caixa.append(a);
   setTimeout(() => a.remove(), tipo === 'erro' ? Math.max(ms, 8000) : ms);
   a.addEventListener('click', () => a.remove());

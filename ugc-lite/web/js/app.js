@@ -30,6 +30,7 @@ function erroPagina(e) {
 async function rotear() {
   const [rota, arg] = location.hash.replace(/^#\/?/, '').split('/');
   const nome = rota || 'inicio';
+  document.querySelectorAll('.modal-fundo').forEach((m) => m.remove());
   document.querySelectorAll('#menu a.item').forEach((a) => a.classList.toggle('ativo', a.dataset.rota === nome));
   const noEditor = nome === 'editor';
   document.getElementById('app').classList.toggle('compacto', noEditor);

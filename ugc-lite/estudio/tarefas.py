@@ -230,6 +230,9 @@ def traduzir_erro_ffmpeg(stderr: str) -> str:
         return "Sem permissão para ler ou gravar o arquivo. Verifique se ele está aberto em outro programa."
     if "no space left" in s:
         return "Não há espaço livre suficiente no disco."
+    if "no such filter" in s and ("'ass'" in s or "subtitles" in s):
+        return ("Esta versão do FFmpeg não grava legendas (falta a biblioteca libass). Exporte sem "
+                "legendas ou instale a versão “full” do FFmpeg (gyan.dev).")
     if "unknown encoder" in s or "encoder not found" in s:
         return "O codificador de vídeo não está disponível nesta versão do FFmpeg."
     if "qsv" in s and ("error" in s or "failed" in s):

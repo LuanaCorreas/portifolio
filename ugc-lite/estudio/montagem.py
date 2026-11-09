@@ -59,13 +59,25 @@ def _blocos_do_take(m: dict, detalhe: dict | None) -> list[dict]:
         # take sem fala (ex.: close do produto) — bloco visual
         return [{"midia": m["id"], "ini": 0.0, "fim": dur, "texto": "", "visual": True,
                  "movimento": analise.movimento_em(mov, 0, dur) if mov else 0}]
-    blocos, atual = [], [frases[0]]
+    # Agrupa frases seguidas que falam do mesmo assunto. Um take longo (tudo
+    # gravado de uma vez) vira vários blocos: gancho, apresentação, benefícios…
+    def assunto(f):
+        texto = " " + analise.normalizar(f["texto"]) + " "
+        pontos = {e: sum(1 for p in lista if f" {p}" in texto) for e, lista in PALAVRAS.items()}
+        melhor = max(pontos, key=pontos.get)
+        return melhor if pontos[melhor] > 0 else None
+
+    blocos, atual, tema = [], [frases[0]], assunto(frases[0])
     for f in frases[1:]:
-        # nova "ideia" quando há pausa maior que 1 s e o bloco já tem conteúdo
-        if f["ini"] - atual[-1]["fim"] > 1.0 and sum(x["fim"] - x["ini"] for x in atual) > 2.5:
+        t = assunto(f)
+        falado = sum(x["fim"] - x["ini"] for x in atual)
+        pausa = f["ini"] - atual[-1]["fim"]
+        muda_tema = t is not None and tema is not None and t != tema and falado >= 1.0
+        if (pausa > 1.0 and falado >= 1.0) or muda_tema:
             blocos.append(atual)
-            atual = []
+            atual, tema = [], None
         atual.append(f)
+        tema = tema or t
     blocos.append(atual)
     saida = []
     for b in blocos:

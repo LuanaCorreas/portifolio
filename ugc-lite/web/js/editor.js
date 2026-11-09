@@ -624,6 +624,7 @@ export class Editor {
   }
 
   aguardarExportacao() {
+    if (this.pararExportacao) this.pararExportacao();
     const parar = aoMudarTarefa((t) => {
       if (t.projeto !== this.pid || t.tipo !== 'exportar') return;
       if (t.estado === 'concluida' && t.resultado) {
@@ -642,6 +643,7 @@ export class Editor {
         });
       } else if (['erro', 'cancelada'].includes(t.estado)) parar();
     });
+    this.pararExportacao = parar;
   }
 
   destruir() {
@@ -650,6 +652,7 @@ export class Editor {
     document.removeEventListener('keydown', this.teclas);
     window.removeEventListener('beforeunload', this.antesDeSair);
     this.desligarTarefas();
+    if (this.pararExportacao) this.pararExportacao();
     this.player.destruir();
     this.timeline.destruir();
   }

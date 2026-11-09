@@ -593,6 +593,7 @@ export class Paineis {
       if (!ok) return;
     }
     try {
+      await ed.salvarAgora(); // o servidor lê a timeline salva
       const r = await api(`/api/projetos/${ed.pid}/legendas/gerar`, { metodo: 'POST', dados: { max_palavras: ed.estiloLegenda().max_palavras || 5 } });
       if (!r.legendas.length) { aviso('Nenhuma fala transcrita nos trechos da timeline. Analise os takes primeiro (aba Análise IA).', 'info', 6000); return; }
       ed.editar('Gerar legendas', (tl) => { tl.legendas = r.legendas; });
