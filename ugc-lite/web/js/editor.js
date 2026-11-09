@@ -601,7 +601,7 @@ export class Editor {
     const cfg = this.cfg;
     const cob = LT.cobertura(this.tl, this.midias());
     const corpo = el('div', {},
-      opc('final', 'Vídeo final', `MP4 · H.264 · ${cfg.export_largura}×${cfg.export_altura} (9:16) · ${cfg.export_fps} fps · áudio AAC ${cfg.export_audio_kbps} kbps`),
+      opc('final', 'Vídeo final', `MP4 · H.264 · ${cfg.export_largura}×${cfg.export_altura} (9:16) · ${cfg.export_fps} fps · áudio AAC ${cfg.export_audio_kbps} kbps${cfg.export_normalizar ? ' · volume normalizado' : ''}`),
       opc('previa', 'Prévia leve', `${cfg.previa_largura}×${cfg.previa_altura}, codificação rápida — para conferir antes do final e economizar processamento.`),
       el('label', { class: 'check', style: { margin: '8px 0' } }, leg, 'Gravar as legendas no vídeo'),
       el('p', { class: 'fraco' }, `Duração: ${LT.formatarTempo(LT.duracaoTotal(this.tl), true)}. Os cortes são feitos a partir dos arquivos originais, que continuam intactos. Também salvamos um arquivo .srt com as legendas.`),

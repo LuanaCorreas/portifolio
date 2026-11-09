@@ -52,6 +52,7 @@ PADRAO = {
     "export_audio_kbps": 160,
     "export_enquadramento": "preencher",  # preencher (corta bordas) | ajustar (barras)
     "export_quicksync": False,             # Intel Quick Sync (experimental)
+    "export_normalizar": True,             # volume padrão de redes sociais (-14 LUFS)
     "export_pasta": "",                    # vazio = pasta do projeto
     "previa_largura": 540,
     "previa_altura": 960,

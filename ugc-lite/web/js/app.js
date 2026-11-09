@@ -277,6 +277,7 @@ async function paginaConfiguracoes() {
           campo('export_audio_kbps', 'Áudio (kbps)', 'number', '', [[128, '128'], [160, '160'], [192, '192'], [256, '256']]),
           campo('export_fps', 'Quadros por segundo', 'number', '', [[30, '30 fps'], [24, '24 fps'], [60, '60 fps']])),
         campo('export_pasta', 'Pasta para salvar os vídeos finais (opcional)', 'text', 'Vazio = dentro da pasta do projeto. Ex.: C:\\Users\\Voce\\Videos'),
+        campo('export_normalizar', 'Normalizar volume para redes sociais', 'checkbox', 'Deixa a voz no volume padrão de Reels/TikTok (-14 LUFS), sem estourar.'),
         campo('export_quicksync', 'Usar Intel Quick Sync (experimental)', 'checkbox', 'Usa a Intel UHD Graphics para codificar. Se falhar, o app volta automaticamente para a CPU.'))),
   );
 }

@@ -149,7 +149,7 @@ def gerar_srt(projeto: dict) -> str:
 
 def montar_comando(projeto: dict, saida: str, *, largura: int, altura: int, fps: int,
                    codec_video: list[str], audio_kbps: int, enquadramento: str,
-                   ass: str | None) -> tuple[list[str], float]:
+                   ass: str | None, normalizar: bool = False) -> tuple[list[str], float]:
     pid = projeto["id"]
     tl = projeto.get("timeline", {})
     midias = {m["id"]: m for m in projeto.get("midias", [])}
@@ -235,9 +235,11 @@ def montar_comando(projeto: dict, saida: str, *, largura: int, altura: int, fps:
         mapa_v = "[vout]"
     else:
         mapa_v = "[vc]"
+    # Volume padrão de Reels/TikTok/Shorts: -14 LUFS, picos até -1,5 dB.
+    volume = ",loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000" if normalizar else ""
     if audios:
         filtros.append(f"{''.join(audios)}amix=inputs={len(audios)}:normalize=0:"
-                       f"dropout_transition=0:duration=longest,apad,atrim=0:{total:.3f}[aout]")
+                       f"dropout_transition=0:duration=longest{volume},apad,atrim=0:{total:.3f}[aout]")
     else:
         filtros.append(f"anullsrc=r=48000:cl=stereo,atrim=0:{total:.3f}[aout]")
 
@@ -291,7 +293,7 @@ def exportar(tarefa: Tarefa, pid: str, tipo: str = "final", legendas: bool = Tru
         cmd, total = montar_comando(
             projeto, str(saida), largura=largura, altura=altura, fps=fps, codec_video=codec,
             audio_kbps=int(cfg["export_audio_kbps"]), enquadramento=cfg["export_enquadramento"],
-            ass="legendas.ass" if ass else None)
+            ass="legendas.ass" if ass else None, normalizar=bool(cfg["export_normalizar"]))
         msg = "Gerando prévia…" if previa else "Exportando vídeo…"
         if i > 0:
             msg = "Quick Sync indisponível — exportando pela CPU…"
