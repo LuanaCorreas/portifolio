@@ -1,0 +1,4 @@
+# Meu Estúdio UGC Lite — dados locais (projetos, cópias de mídia, exportações)
+ugc-lite/dados/
+__pycache__/
+*.pyc
