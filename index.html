@@ -64,6 +64,10 @@ h1{font-size:clamp(3rem,9vw,6.4rem);letter-spacing:-.01em}
 .card:hover{transform:translateY(-6px)}
 .capa9{position:relative;aspect-ratio:9/16;margin-bottom:1rem}
 .capa9 .ph{position:absolute;inset:0}
+.capa9>button{position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;background:none;cursor:pointer;display:block}
+.capa9 iframe,.capa9 video{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#000}
+.item .capa9{aspect-ratio:4/5;margin-bottom:0}
+.item .play{width:52px;height:52px}
 .play{position:absolute;inset:0;margin:auto;width:68px;height:68px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center}
 .play::after{content:"";margin-left:5px;border:11px solid transparent;border-left:18px solid var(--terra);border-right:0}
 .big{font:400 2.6rem "DM Serif Display",serif;color:var(--terra);line-height:1}
@@ -289,7 +293,9 @@ var MARCAS=["Pantene","Eudora","Dove","Marca 04","Marca 05","Marca 06","Marca 07
 var CAPA=[{to:0,pre:"+",l:"vídeos entregues"},{to:0,pre:"+",l:"marcas atendidas"},{to:0,pre:"+",l:"views somadas"}];
 
 /* ===== DESTAQUES =====
-   link: coloque aqui o endereço do vídeo (Instagram, TikTok, YouTube).
+   link: endereço do vídeo. Ele toca AQUI NA PÁGINA, sem sair do portfólio. Funciona com:
+     - arquivo de vídeo seu, ex: "video1.mp4" (envie o arquivo junto com o index.html)
+     - YouTube (inclusive Shorts), Instagram (reels/posts), TikTok, Vimeo e Google Drive (arquivo compartilhado "qualquer pessoa com o link")
    capa: coloque aqui o arquivo da capa vertical 9:16, ex: "capa1.jpg". Deixe "" para mostrar o bloco de degradê. */
 var DESTAQUES=[
  {link:"#",capa:"",num:"+0,0M",rot:"views no reels",t:"Título do conteúdo 01",c:"Uma linha de contexto sobre a campanha."},
@@ -297,7 +303,8 @@ var DESTAQUES=[
  {link:"#",capa:"",num:"+0,0M",rot:"views no reels",t:"Título do conteúdo 03",c:"Uma linha de contexto sobre a campanha."}
 ];
 
-/* ===== TRABALHOS (nicho define o filtro; img: arquivo da foto 4:5, ou "" para degradê) ===== */
+/* ===== TRABALHOS (nicho define o filtro; img: arquivo da foto 4:5, ou "" para degradê)
+   video (opcional): mesmo formato do "link" dos destaques. Se preencher, o trabalho vira um vídeo que toca na página. ===== */
 var TRABALHOS=[
  {t:"Trabalho 01",n:"Cabelo",img:""},{t:"Trabalho 02",n:"Cabelo",img:""},
  {t:"Trabalho 03",n:"Maquiagem",img:""},{t:"Trabalho 04",n:"Maquiagem",img:""},
@@ -347,16 +354,46 @@ $("marcas").innerHTML=mq+mq;
 var bq=SERVICOS.map(function(s){return "<span>"+s.t+" &bull;</span>"}).join("");
 $("band").innerHTML=bq+bq+bq+bq;
 
+/* ===== PLAYER: transforma o link em vídeo dentro da página ===== */
+function player(link){
+ if(!link||link==="#")return null;
+ var m,a="autoplay=1";
+ if(/\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(link))return{video:link};
+ if(m=link.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([\w-]{11})/))return{src:"https://www.youtube.com/embed/"+m[1]+"?"+a+"&playsinline=1&rel=0"};
+ if(m=link.match(/instagram\.com\/(?:[\w.]+\/)?(?:p|reels?|tv)\/([\w-]+)/))return{src:"https://www.instagram.com/p/"+m[1]+"/embed/"};
+ if(m=link.match(/tiktok\.com\/.*\/video\/(\d+)/))return{src:"https://www.tiktok.com/player/v1/"+m[1]+"?autoplay=1&rel=0"};
+ if(m=link.match(/vimeo\.com\/(?:video\/)?(\d+)/))return{src:"https://player.vimeo.com/video/"+m[1]+"?"+a};
+ if(m=link.match(/drive\.google\.com\/(?:file\/d\/|open\?id=)([\w-]+)/))return{src:"https://drive.google.com/file/d/"+m[1]+"/preview"};
+ return{fora:link};
+}
+function capaVideo(link,capa,leg,titulo){
+ var p=player(link),img=ph(capa,leg,"Capa do vídeo "+titulo);
+ if(!p)return img+'<span class="play" aria-hidden="true"></span>';
+ return '<button type="button" data-link="'+esc(link)+'" data-t="'+esc(titulo)+'" aria-label="Assistir: '+esc(titulo)+'">'+img+'<span class="play" aria-hidden="true"></span></button>';
+}
+var tocando=null;
+function parar(){if(tocando){tocando.box.innerHTML=tocando.html;tocando=null}}
+document.addEventListener("click",function(e){
+ var b=e.target.closest(".capa9>button");if(!b)return;
+ var p=player(b.dataset.link),box=b.parentNode;
+ if(p.fora){window.open(p.fora,"_blank","noopener");return}
+ parar();tocando={box:box,html:box.innerHTML};
+ box.innerHTML=p.video
+  ?'<video src="'+esc(p.video)+'" controls autoplay playsinline aria-label="'+esc(b.dataset.t)+'"></video>'
+  :'<iframe src="'+esc(p.src)+'" title="'+esc(b.dataset.t)+'" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>';
+ var v=box.querySelector("video,iframe");if(v)v.focus();
+});
+
 $("tres").innerHTML=DESTAQUES.map(function(d){
- return '<a class="card rv" href="'+esc(d.link)+'" target="_blank" rel="noopener" aria-label="Assistir: '+esc(d.t)+'"><div class="capa9">'+ph(d.capa,"capa do vídeo 9:16","Capa do vídeo "+d.t)+'<span class="play" aria-hidden="true"></span></div><div class="big">'+d.num+'</div><div class="rot">'+d.rot+'</div><h3>'+d.t+'</h3><p>'+d.c+'</p></a>'}).join("");
+ return '<article class="card rv"><div class="capa9">'+capaVideo(d.link,d.capa,"capa do vídeo 9:16",d.t)+'</div><div class="big">'+d.num+'</div><div class="rot">'+d.rot+'</div><h3>'+d.t+'</h3><p>'+d.c+'</p></article>'}).join("");
 
 var nichos=["Todos"];TRABALHOS.forEach(function(t){if(nichos.indexOf(t.n)<0)nichos.push(t.n)});
 $("filtros").innerHTML=nichos.map(function(n,i){return '<button type="button" aria-pressed="'+(i==0)+'" data-n="'+n+'">'+n+'</button>'}).join("");
-$("gal").innerHTML=TRABALHOS.map(function(t){return '<article class="item" data-n="'+t.n+'">'+(t.img?ph(t.img,"","Trabalho "+t.t):'<div class="ph" role="img" aria-label="Espaço para trabalho '+t.t+'">foto 4:5</div>')+'<h3>'+t.t+'</h3><small>'+t.n+'</small></article>'}).join("");
+$("gal").innerHTML=TRABALHOS.map(function(t){return '<article class="item" data-n="'+t.n+'">'+(t.video&&player(t.video)?'<div class="capa9">'+capaVideo(t.video,t.img,"vídeo",t.t)+'</div>':t.img?ph(t.img,"","Trabalho "+t.t):'<div class="ph" role="img" aria-label="Espaço para trabalho '+t.t+'">foto 4:5</div>')+'<h3>'+t.t+'</h3><small>'+t.n+'</small></article>'}).join("");
 $("filtros").addEventListener("click",function(e){
  var b=e.target.closest("button");if(!b)return;
  document.querySelectorAll("#filtros button").forEach(function(x){x.setAttribute("aria-pressed",x===b)});
- document.querySelectorAll(".item").forEach(function(it){it.hidden=!(b.dataset.n==="Todos"||it.dataset.n===b.dataset.n)});
+ parar();document.querySelectorAll(".item").forEach(function(it){it.hidden=!(b.dataset.n==="Todos"||it.dataset.n===b.dataset.n)});
 });
 
 $("serv").innerHTML=SERVICOS.map(function(s,i){return '<article class="rv"><div class="n">'+fmt(i+1)+'</div><h3>'+s.t+'</h3><p>'+s.d+'</p></article>'}).join("");
